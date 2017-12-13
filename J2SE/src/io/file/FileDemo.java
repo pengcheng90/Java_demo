@@ -9,7 +9,7 @@ import java.io.IOException;
  */
 public class FileDemo {
     public static void main(String[] args) throws IOException {
-       delete();
+        delete();
     }
 
     /**
@@ -46,10 +46,10 @@ public class FileDemo {
      * 文件删除
      */
     public static void delete() throws IOException {
-        File file=new File("test.txt");
+        File file = new File("test.txt");
         boolean newFile = file.createNewFile();
-        System.out.println("文件创建是否成功："+newFile);
+        System.out.println("文件创建是否成功：" + newFile);
         boolean delete = file.delete();
-        System.out.println("文件是否删除成功："+delete);
+        System.out.println("文件是否删除成功：" + delete);
     }
 }
