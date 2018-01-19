@@ -45,7 +45,7 @@ public class FileInputStreamDemo {
             in = new FileInputStream("a.txt");
             byte [] bs=new byte[1024];
             //TODO
-            //注意！：此处从输入流读取3个字节（0-3），放入到数组的1-3下标下
+            //注意！：此处从输入流读取3个字节（1-3），放入到数组的0-2下标下
             int len = in.read(bs, 1, 3);
             System.out.println(new String(bs,0,3));//读取错误
             System.out.println(new String(bs,1,3));//从数组下标1读取正确
