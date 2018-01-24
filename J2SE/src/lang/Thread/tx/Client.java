@@ -2,6 +2,7 @@ package lang.Thread.tx;
 
 /**
  * 线程间通讯：通过Object的wait（）等待，和notify（）唤醒实现线程间通讯
+ * 测试生产者、消费者线程间通讯
  */
 public class Client {
     public static void main(String[] args) {

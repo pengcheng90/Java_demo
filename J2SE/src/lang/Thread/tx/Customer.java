@@ -19,8 +19,8 @@ public class Customer implements Runnable {
                     }
                 }
                 fruit.setExist(false);
+                System.out.println(fruit.getName()+"被购买了。。");
                 fruit.notify();
-                System.out.println("水果被购买了。。");
                 try {
                     Thread.sleep(500L);
                 } catch (InterruptedException e) {

@@ -19,7 +19,7 @@ public class Product implements Runnable {
                         e.printStackTrace();
                     }
                 }
-                System.out.println("水果被生产了。。");
+                System.out.println(fruit.getName()+"被生产了。。");
                 fruit.setExist(true);
                 fruit.notify();//唤醒
                 try {
