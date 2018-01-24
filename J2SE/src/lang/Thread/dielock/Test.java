@@ -6,6 +6,9 @@ package lang.Thread.dielock;
  * 产生死锁的两种情况：
  * 当两个线程相互调用Thread.join();
  * 当两个线程使用嵌套的同步块时，一个线程占用了另一个线程的必需的锁，互相等待时被阻塞，就有可能出现死锁。
+ *
+ * 备注：死锁程序不是每次都出现死锁，会有出现的概率。如下：
+ * 线程死锁，有可能线程一拿到锁1，然后线程2还没拿到锁2，然后线程1就可以拿到锁2
  */
 public class Test {
     public static void main(String[] args) {
