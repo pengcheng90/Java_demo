@@ -3,13 +3,16 @@ package proxy;
 /**
  * 静态代理
  */
-public class Proxy implements HireHouse {
+public class HireProxy implements HireHouse {
     private HireHouse hireHouse;
+
+    public HireProxy(HireHouse hireHouse) {
+        this.hireHouse = hireHouse;
+    }
 
     @Override
     public void hire() {
-        if (hireHouse == null) hireHouse = new RealHireHouse();
-        System.out.println("加佣金");
+        System.out.println("收中介费");
         hireHouse.hire();
         System.out.println("扣押金");
 

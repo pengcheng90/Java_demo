@@ -14,9 +14,9 @@ package proxy;
  * 第三种：真实角色，代理所代理的真实角色，是我们要引用的对象
  *
  */
-public class Test {
+public class Client {
     public static void main(String[] args) {
-        HireHouse hireHouse=new Proxy();
+        HireHouse hireHouse=new HireProxy(new RealHireHouse());
         hireHouse.hire();
     }
 }
