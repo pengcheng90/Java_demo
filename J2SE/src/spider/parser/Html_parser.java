@@ -16,17 +16,18 @@ import java.util.Iterator;
  */
 public class Html_parser {
 
+    /**
+     * 从文件加载文档
+     * @param args
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
 
         File input = new File("J2SE/testDirectory/input.html");
+        // 第三个参数baseUri参数用于解决文件中URLs是相对路径的问题。如果不需要可以传入一个空的字符串。
         Document doc = Jsoup.parse(input, "UTF-8", "http://example.com/");
 
-        Element content = doc.getElementById("content");
-        Elements links = content.getElementsByTag("a");
-        for (Element link : links) {
-            String linkHref = link.attr("href");
-            String linkText = link.text();
-        }
+        System.out.println(doc);
     }
 
     /**
