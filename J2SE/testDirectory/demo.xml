@@ -1,0 +1,5 @@
+<beans>
+    <bean name="demo">demo.java</bean>
+    <bean name="home">home.java</bean>
+    <bean name="index">index.java</bean>
+</beans>
