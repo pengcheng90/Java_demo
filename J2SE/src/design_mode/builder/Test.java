@@ -13,9 +13,9 @@ package design_mode.builder;
 
  Builder：为创建一个Product对象的各个部件指定抽象接口。
 
- ConcreteBuilder：实现Builder的接口以构造和装配该产品的各个部件，定义并明确它所创建的表示，提供一个检索产品的接口
+ ConcreteBuilder：实现Builder的接口以构造和装配该产品的各个部件，定义并明确它所创建的表示，提供一个检索产品的接口，具体建造者
 
- Director：构造一个使用Builder接口的对象。
+ Director：构造一个使用Builder接口的对象。Director的内容是如何将部件最后组装成成品
 
  Product：表示被构造的复杂对象。ConcreateBuilder创建该产品的内部表示并定义它的装配过程。
 

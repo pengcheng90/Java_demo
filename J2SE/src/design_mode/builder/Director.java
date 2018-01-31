@@ -1,5 +1,9 @@
 package design_mode.builder;
 
+/**
+ * Director的内容是如何将部件最后组装成成品
+ */
+
 public class Director {
     private Builder builder;
 
