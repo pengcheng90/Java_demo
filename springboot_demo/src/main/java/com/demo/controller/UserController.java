@@ -1,12 +1,13 @@
 package com.demo.controller;
 
 import com.demo.domain.User;
-import io.swagger.annotations.ApiOperation;
+import com.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import com.demo.service.UserService;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 @Controller
 @RequestMapping("/user")
@@ -22,14 +23,14 @@ public class UserController {
         return "forward:/user";
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.POST)
-    public String login(@RequestParam(value = "username") String username,
-                        @RequestParam(value = "password") String password,
-                        Model model) {
-        User user = userService.findByUserNameAndPasss(username, password);
-        System.out.println(user+" is login");
-        if (user != null)
-            model.addAttribute("user", user);
-        return "redirect:/index";
-    }
+//    @RequestMapping(value = "/", method = RequestMethod.POST)
+//    public String login(@RequestParam(value = "username") String username,
+//                        @RequestParam(value = "password") String password,
+//                        Model model) {
+//        User user = userService.findByUserNameAndPasss(username, password);
+//        System.out.println(user+" is login");
+//        if (user != null)
+//            model.addAttribute("user", user);
+//        return "redirect:/index";
+//    }
 }

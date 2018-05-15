@@ -1,5 +1,7 @@
 package com.demo.domain;
 
+import com.demo.annotation.Des;
+
 /**
  * Created with IntelliJ IDEA.
  * User:
@@ -7,15 +9,24 @@ package com.demo.domain;
  * Time: 15:21
  * Description:用户实体
  */
-public class User {
+public class User <T>{
 
+    @Des("id,类型Long")
     private Long id;
-
+    @Des("username.用户名")
     private String username;
-
+    @Des("password.密码")
     private String password;
-
     private String updatetime;
+    private T data;
+
+    public T getData() {
+        return data;
+    }
+
+    public void setData(T data) {
+        this.data = data;
+    }
 
     public Long getId() {
         return id;

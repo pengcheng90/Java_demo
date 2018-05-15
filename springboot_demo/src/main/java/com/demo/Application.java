@@ -9,7 +9,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @MapperScan("com/demo/dao")
 public class Application {
     public static void main(String[] args) {
+        SpringApplication application = new SpringApplication(Application.class);
         //启动
-        SpringApplication.run(Application.class, args);
+        application.addListeners(new AppStartedEventListener());
+        application.run(args);
     }
 }
