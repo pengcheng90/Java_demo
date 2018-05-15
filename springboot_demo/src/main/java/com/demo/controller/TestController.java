@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
+//访问：http://localhost:8080/swagger-ui.html 查看生成api文档
 @RequestMapping("swagger")
 @RestController
 public class TestController {
