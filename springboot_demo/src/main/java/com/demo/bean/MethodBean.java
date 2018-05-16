@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class MethodBean {
+    //    请求类型（get，post）
+    String type;
     //url
     String url;
     //    请求json模板
@@ -13,6 +15,14 @@ public class MethodBean {
     Set<ParameterBean> requestSet = new HashSet<>();
     //reponse字段
     Set<ParameterBean> responseSet = new HashSet<>();
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public String getUrl() {
         return url;
@@ -57,7 +67,8 @@ public class MethodBean {
     @Override
     public String toString() {
         return "MethodBean{" +
-                "url='" + url + '\'' +
+                "type='" + type + '\'' +
+                ", url='" + url + '\'' +
                 ", requestJson='" + requestJson + '\'' +
                 ", responseJson='" + responseJson + '\'' +
                 ", requestSet=" + requestSet +

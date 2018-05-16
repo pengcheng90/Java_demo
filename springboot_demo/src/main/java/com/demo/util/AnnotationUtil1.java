@@ -2,18 +2,16 @@ package com.demo.util;
 
 import com.demo.annotation.DataType;
 import com.demo.annotation.Des;
-import com.demo.annotation.ResponseType;
 import com.demo.bean.MethodBean;
 import com.demo.bean.ParameterBean;
 import com.demo.bean.UrlBean;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -40,20 +38,35 @@ public class AnnotationUtil1 {
         }
     }
 
+    /**
+     * 获取类对应所有方法bean
+     *
+     * @param cls
+     * @return
+     */
     private static Set<MethodBean> getMethodBeans(Class<?> cls) {
         Set<MethodBean> methodBeanSet = new HashSet<>();
 //       获取类对应的所有方法
         Method[] methods = cls.getMethods();
         for (Method method : methods) {
+            MethodBean methodBean = new MethodBean();
             PostMapping annoPostMapping = method.getAnnotation(PostMapping.class);
             if (annoPostMapping != null) {
-                MethodBean methodBean = new MethodBean();
                 methodBean.setUrl(annoPostMapping.value()[0]);
 //                设置请求体
                 methodBean.setRequestSet(getMethodRequestBeans(method, methodBean));
+                methodBean.setType("POST");
                 methodBeanSet.add(methodBean);
+            } else {
+                GetMapping annoGetMapping = method.getAnnotation(GetMapping.class);
+                if (annoGetMapping != null) {
+                    methodBean.setUrl(annoGetMapping.value()[0]);
+                    //                设置请求体
+                    methodBean.setRequestSet(getMethodRequestBeans(method, methodBean));
+                    methodBean.setType("GET");
+                    methodBeanSet.add(methodBean);
+                }
             }
-//
         }
         return methodBeanSet;
     }
@@ -77,37 +90,54 @@ public class AnnotationUtil1 {
 //                获取参数的所有属性
                 Field[] fields = type.getDeclaredFields();
 
+                Class[] dataTypeClass = annoDataType.type();
+                String[] name = annoDataType.name();
+
                 for (Field field : fields) {
-                    if (annoDataType != null && field.getName().equals(annoDataType.name())) {
+                    if (name != null && name.length > 0) {
+                        for (int i = 0; i < name.length; i++) {
+                            if (annoDataType != null && field.getName().equals(name[i])) {
 //                        获取注解的Class类型
-                        Class dataTypeClass = annoDataType.type();
 //                        获取泛型上所有属性对应的bean
-                        getClassFields(dataTypeClass, parameterBeanSet);
-                    } else {//当前属性为非泛型类型
-                        parameterBeanSet.add(getFieldBean(field));
+                                getClassFields(dataTypeClass[i], parameterBeanSet);
+                            } else {
+                                //当前属性为非泛型类型
+                                parameterBeanSet.add(getFieldBean(field));
+                            }
+                        }
                     }
                 }
-//                生成请求json模板
+
+                //生成请求json模板
                 try {
                     Object o = type.newInstance();
-                    if (annoDataType != null) {
-                        Field declaredField = type.getDeclaredField(annoDataType.name());
-                        declaredField.setAccessible(true);
-                        declaredField.set(o, annoDataType.type().newInstance());
+                    Class type1 = dataTypeClass[0];
+
+                    if (name != null && name.length > 0) {
+                        for (int i = 0; i < name.length; i++) {
+                            Field declaredField = type.getDeclaredField(name[i]);
+                            declaredField.setAccessible(true);
+                            Object o1 = type1.newInstance();
+                            declaredField.set(o, o1);
+                            if (i + 1 < name.length) {
+                                o = o1;
+                                type1 = dataTypeClass[i + 1];
+                                type = type1;
+                            }
+                        }
                     }
-//                    System.out.println(new ObjectMapper().writeValueAsString(o));
+                    System.out.println(new ObjectMapper().writeValueAsString(o));
                     methodBean.setRequestJson(new ObjectMapper().writeValueAsString(o));
                 } catch (InstantiationException e) {
                     e.printStackTrace();
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
-                } catch (NoSuchFieldException e) {
-                    e.printStackTrace();
                 } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                } catch (NoSuchFieldException e) {
                     e.printStackTrace();
                 }
             }
-
         }
         return parameterBeanSet;
     }
