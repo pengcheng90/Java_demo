@@ -1,19 +1,12 @@
-package com.demo.util;
+package com.demo.bean;
 
-public class FiledDes {
-    private String name;
-    private String desc;
-    private String type;
-
-    public FiledDes() {
-
-    }
-
-    public FiledDes(String name, String desc, String type) {
-        this.name = name;
-        this.desc = desc;
-        this.type = type;
-    }
+public class ParameterBean {
+    //参数名
+    String name;
+    //参数描述
+    String desc;
+    //参数类型
+    String type;
 
     public String getName() {
         return name;
@@ -41,7 +34,7 @@ public class FiledDes {
 
     @Override
     public String toString() {
-        return "FiledDes{" +
+        return "ParameterBean{" +
                 "name='" + name + '\'' +
                 ", desc='" + desc + '\'' +
                 ", type='" + type + '\'' +

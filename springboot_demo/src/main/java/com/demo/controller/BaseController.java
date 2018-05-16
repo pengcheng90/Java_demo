@@ -1,7 +1,9 @@
 package com.demo.controller;
 
+import com.demo.domain.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,7 +35,7 @@ public class BaseController {
     }
 
     @RequestMapping(value = "/test")
-    public String test(Model model) {
+    public String test(@RequestBody User user) {
 //        if (!model.containsAttribute("user")) {
 //            return "login";
 //        }

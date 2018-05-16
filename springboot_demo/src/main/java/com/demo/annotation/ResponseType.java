@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = {ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
-public @interface DataType {
+public @interface ResponseType {
     //属性名
     String name();
 
