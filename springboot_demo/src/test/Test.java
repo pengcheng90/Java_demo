@@ -14,4 +14,11 @@ public class Test {
 
     }
 
+    @org.junit.Test
+    public void test() {
+        String s = "aa";
+        if (s.getClass().getName().equals(String.class.getName())) {
+            System.out.println("yes");
+        }
+    }
 }

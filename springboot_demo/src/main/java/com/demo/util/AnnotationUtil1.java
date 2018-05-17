@@ -2,6 +2,7 @@ package com.demo.util;
 
 import com.demo.annotation.DataType;
 import com.demo.annotation.Des;
+import com.demo.annotation.ResponseType;
 import com.demo.bean.MethodBean;
 import com.demo.bean.ParameterBean;
 import com.demo.bean.UrlBean;
@@ -21,7 +22,7 @@ import java.util.Set;
 
 public class AnnotationUtil1 {
 
-    //    解析所有controller.java
+    //解析所有controller.java
     public static void validAnnotation(List<Class<?>> clsList) {
 
         if (clsList != null && clsList.size() > 0) {
@@ -29,11 +30,15 @@ public class AnnotationUtil1 {
                 UrlBean urlBean = new UrlBean();
                 RestController annotation = cls.getAnnotation(RestController.class);
                 if (annotation != null) {
-//    设置class的url
+                    //设置class的url
                     urlBean.setClassUrl(annotation.value());
                 }
                 urlBean.setMethodBeans(getMethodBeans(cls));
-                System.out.println("urlBean:" + urlBean);
+                try {
+                    System.out.println("urlBean:" + new ObjectMapper().writeValueAsString(urlBean));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -46,29 +51,82 @@ public class AnnotationUtil1 {
      */
     private static Set<MethodBean> getMethodBeans(Class<?> cls) {
         Set<MethodBean> methodBeanSet = new HashSet<>();
-//       获取类对应的所有方法
+        //获取类对应的所有方法
         Method[] methods = cls.getMethods();
         for (Method method : methods) {
             MethodBean methodBean = new MethodBean();
             PostMapping annoPostMapping = method.getAnnotation(PostMapping.class);
             if (annoPostMapping != null) {
                 methodBean.setUrl(annoPostMapping.value()[0]);
-//                设置请求体
+                //设置请求体
                 methodBean.setRequestSet(getMethodRequestBeans(method, methodBean));
+//                @TODO 设置responseBean
+                methodBean.setResponseSet(getMethodReponseBeans(method, methodBean));
                 methodBean.setType("POST");
                 methodBeanSet.add(methodBean);
             } else {
                 GetMapping annoGetMapping = method.getAnnotation(GetMapping.class);
                 if (annoGetMapping != null) {
                     methodBean.setUrl(annoGetMapping.value()[0]);
-                    //                设置请求体
+                    //设置请求体
                     methodBean.setRequestSet(getMethodRequestBeans(method, methodBean));
+                    methodBean.setResponseSet(getMethodReponseBeans(method, methodBean));
                     methodBean.setType("GET");
                     methodBeanSet.add(methodBean);
                 }
             }
         }
         return methodBeanSet;
+    }
+
+    /**
+     * 获取ResponseBeans
+     *
+     * @param method
+     * @param methodBean
+     * @return
+     */
+    private static Set<ParameterBean> getMethodReponseBeans(Method method, MethodBean methodBean) {
+        Set<ParameterBean> parameterBeanSet = new HashSet<>();
+        Class<?> returnType = method.getReturnType();
+        ResponseType annoResponseType = method.getAnnotation(ResponseType.class);
+        String annoNames[] = null;
+        Class[] annoClazzs = null;
+        if (annoResponseType != null) {
+            annoNames = annoResponseType.name();
+            annoClazzs = annoResponseType.type();
+        }
+        getParameBeans(parameterBeanSet, returnType, annoNames, annoClazzs, annoResponseType != null);
+        return parameterBeanSet;
+    }
+
+    /**
+     * 获取请求或者响应字段对应的bean
+     *
+     * @param parameterBeanSet
+     * @param returnType
+     * @param annoNames
+     * @param annoClazzs
+     * @param b
+     */
+    private static void getParameBeans(Set<ParameterBean> parameterBeanSet, Class<?> returnType, String[] annoNames, Class[] annoClazzs, boolean b) {
+        if (annoNames != null && annoNames.length > 0) {
+            for (Field field : returnType.getDeclaredFields()) {
+                for (int i = 0; i < annoNames.length; i++) {
+                    if (b && field.getName().equals(annoNames[i])) {
+//                        获取注解的Class类型
+//                        获取泛型上所有属性对应的bean
+                        getClassFields(annoClazzs[i], parameterBeanSet);
+                    } else {
+                        //当前属性为非泛型类型
+                        parameterBeanSet.add(getFieldBean(field));
+                    }
+                }
+            }
+        } else {
+            ParameterBean parameterBean = new ParameterBean();
+            getClassFields(returnType, parameterBeanSet);
+        }
     }
 
     /**
@@ -93,20 +151,8 @@ public class AnnotationUtil1 {
                 Class[] dataTypeClass = annoDataType.type();
                 String[] name = annoDataType.name();
 
-                for (Field field : fields) {
-                    if (name != null && name.length > 0) {
-                        for (int i = 0; i < name.length; i++) {
-                            if (annoDataType != null && field.getName().equals(name[i])) {
-//                        获取注解的Class类型
-//                        获取泛型上所有属性对应的bean
-                                getClassFields(dataTypeClass[i], parameterBeanSet);
-                            } else {
-                                //当前属性为非泛型类型
-                                parameterBeanSet.add(getFieldBean(field));
-                            }
-                        }
-                    }
-                }
+                //
+                getParameBeans(parameterBeanSet, type, name, dataTypeClass, dataTypeClass != null);
 
                 //生成请求json模板
                 try {
@@ -126,7 +172,7 @@ public class AnnotationUtil1 {
                             }
                         }
                     }
-                    System.out.println(new ObjectMapper().writeValueAsString(o));
+//                    System.out.println(new ObjectMapper().writeValueAsString(o));
                     methodBean.setRequestJson(new ObjectMapper().writeValueAsString(o));
                 } catch (InstantiationException e) {
                     e.printStackTrace();
@@ -142,12 +188,36 @@ public class AnnotationUtil1 {
         return parameterBeanSet;
     }
 
+    /**
+     * 获取Class的所有属性对应的beans
+     *
+     * @param clazz
+     * @param parameterBeanSet
+     */
     private static void getClassFields(Class clazz, Set<ParameterBean> parameterBeanSet) {
+        ParameterBean parameterBean = new ParameterBean();
+        /**
+         * 判断类型是否为String，或者Integer等类型
+         */
+        if (clazz.getName().equals(String.class.getName())) {
+            parameterBean.setType(String.class.getSimpleName());
+            parameterBeanSet.add(parameterBean);
+            return;
+        } else if (clazz.getName().equals(Integer.class.getName())) {
+            parameterBean.setType(String.class.getSimpleName());
+            parameterBeanSet.add(parameterBean);
+            return;
+        } else if (clazz.getName().equals(int.class.getName())) {
+            parameterBean.setType(String.class.getSimpleName());
+            parameterBeanSet.add(parameterBean);
+            return;
+        }
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             parameterBeanSet.add(getFieldBean(field));
         }
     }
+
 
     /**
      * 获取Field对应的bean

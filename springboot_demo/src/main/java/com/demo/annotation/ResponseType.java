@@ -9,8 +9,8 @@ import java.lang.annotation.Target;
 @Target(value = {ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
 public @interface ResponseType {
     //属性名
-    String name();
+    String[] name();
 
     //属性类型
-    Class type();
+    Class[] type();
 }
