@@ -13,12 +13,4 @@ public class Test {
         AnnotationUtil1.validAnnotation(clsList);
 
     }
-
-    @org.junit.Test
-    public void test() {
-        String s = "aa";
-        if (s.getClass().getName().equals(String.class.getName())) {
-            System.out.println("yes");
-        }
-    }
 }

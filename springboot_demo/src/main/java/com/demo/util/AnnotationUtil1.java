@@ -96,7 +96,9 @@ public class AnnotationUtil1 {
             annoNames = annoResponseType.name();
             annoClazzs = annoResponseType.type();
         }
-        getParameBeans(parameterBeanSet, returnType, annoNames, annoClazzs, annoResponseType != null);
+        getParameBeans(parameterBeanSet, returnType, annoNames, annoClazzs);
+//        @TODO 生成json
+        getObjectJson(methodBean, returnType, annoClazzs, annoNames, 1);
         return parameterBeanSet;
     }
 
@@ -107,13 +109,12 @@ public class AnnotationUtil1 {
      * @param returnType
      * @param annoNames
      * @param annoClazzs
-     * @param b
      */
-    private static void getParameBeans(Set<ParameterBean> parameterBeanSet, Class<?> returnType, String[] annoNames, Class[] annoClazzs, boolean b) {
+    private static void getParameBeans(Set<ParameterBean> parameterBeanSet, Class<?> returnType, String[] annoNames, Class[] annoClazzs) {
         if (annoNames != null && annoNames.length > 0) {
             for (Field field : returnType.getDeclaredFields()) {
                 for (int i = 0; i < annoNames.length; i++) {
-                    if (b && field.getName().equals(annoNames[i])) {
+                    if (annoClazzs != null && field.getName().equals(annoNames[i])) {
 //                        获取注解的Class类型
 //                        获取泛型上所有属性对应的bean
                         getClassFields(annoClazzs[i], parameterBeanSet);
@@ -124,7 +125,6 @@ public class AnnotationUtil1 {
                 }
             }
         } else {
-            ParameterBean parameterBean = new ParameterBean();
             getClassFields(returnType, parameterBeanSet);
         }
     }
@@ -152,40 +152,58 @@ public class AnnotationUtil1 {
                 String[] name = annoDataType.name();
 
                 //
-                getParameBeans(parameterBeanSet, type, name, dataTypeClass, dataTypeClass != null);
-
-                //生成请求json模板
-                try {
-                    Object o = type.newInstance();
-                    Class type1 = dataTypeClass[0];
-
-                    if (name != null && name.length > 0) {
-                        for (int i = 0; i < name.length; i++) {
-                            Field declaredField = type.getDeclaredField(name[i]);
-                            declaredField.setAccessible(true);
-                            Object o1 = type1.newInstance();
-                            declaredField.set(o, o1);
-                            if (i + 1 < name.length) {
-                                o = o1;
-                                type1 = dataTypeClass[i + 1];
-                                type = type1;
-                            }
-                        }
-                    }
-//                    System.out.println(new ObjectMapper().writeValueAsString(o));
-                    methodBean.setRequestJson(new ObjectMapper().writeValueAsString(o));
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                } catch (NoSuchFieldException e) {
-                    e.printStackTrace();
-                }
+                getParameBeans(parameterBeanSet, type, name, dataTypeClass);
+                getObjectJson(methodBean, type, dataTypeClass, name, 0);
             }
         }
         return parameterBeanSet;
+    }
+
+    /**
+     * 根据object（解析出泛型）生成json
+     *
+     * @param methodBean
+     * @param type
+     * @param dataTypeClass
+     * @param name
+     * @param type
+     */
+    private static void getObjectJson(MethodBean methodBean, Class<?> type, Class[] dataTypeClass, String[] name, int t) {
+        //生成请求json模板
+        try {
+            if (dataTypeClass == null || name == null || dataTypeClass.length < 1 || name.length < 1)
+                return;
+            Object o = type.newInstance();
+            Class type1 = dataTypeClass[0];
+
+            if (name != null && name.length > 0) {
+                for (int i = 0; i < name.length; i++) {
+                    Field declaredField = type.getDeclaredField(name[i]);
+                    declaredField.setAccessible(true);
+                    Object o1 = type1.newInstance();
+                    declaredField.set(o, o1);
+                    if (i + 1 < name.length) {
+                        o = o1;
+                        type1 = dataTypeClass[i + 1];
+                        type = type1;
+                    }
+                }
+            }
+//                    System.out.println(new ObjectMapper().writeValueAsString(o));
+            String s = new ObjectMapper().writeValueAsString(o);
+            if (t == 0)
+                methodBean.setRequestJson(s);
+            if (t == 1)
+                methodBean.setResponseJson(s);
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
