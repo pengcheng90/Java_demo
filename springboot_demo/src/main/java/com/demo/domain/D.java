@@ -1,6 +1,7 @@
 package com.demo.domain;
 
-import com.demo.annotation.Des;
+
+import annotation.Des;
 
 public class D {
     @Des("字段v1")

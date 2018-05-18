@@ -1,7 +1,7 @@
 package com.demo.controller;
 
-import com.demo.annotation.DataType;
-import com.demo.annotation.ResponseType;
+import annotation.DataType;
+import annotation.ResponseType;
 import com.demo.domain.D;
 import com.demo.domain.DR;
 import com.demo.domain.User;

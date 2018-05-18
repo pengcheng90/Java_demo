@@ -6,12 +6,14 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="J2SE" />
         <module name="springboot_demo" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="JAVA_Demo" target="1.5" />
-      <module name="springboot_demo" target="1.6" />
+    <bytecodeTargetLevel target="8">
+      <module name="api-2doc" target="8" />
+      <module name="J2SE" target="8" />
+      <module name="springboot_demo" target="8" />
     </bytecodeTargetLevel>
   </component>
 </project>
