@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -97,37 +98,15 @@ public class AnnotationUtil1 {
             annoNames = annoResponseType.name();
             annoClazzs = annoResponseType.type();
         }
-        getParameBeans(parameterBeanSet, returnType, annoNames, annoClazzs);
+        parameterBeanSet.addAll(getClassParameBeans(returnType, annoNames));
+        if (annoClazzs != null) {
+            for (Class clazz : annoClazzs) {
+                parameterBeanSet.addAll(getClassParameBeans(clazz, annoNames));
+            }
+        }
 //        @TODO 生成json
         getObjectJson(methodBean, returnType, annoClazzs, annoNames, 1);
         return parameterBeanSet;
-    }
-
-    /**
-     * 获取请求或者响应字段对应的bean
-     *
-     * @param parameterBeanSet
-     * @param returnType
-     * @param annoNames
-     * @param annoClazzs
-     */
-    private static void getParameBeans(Set<ParameterBean> parameterBeanSet, Class<?> returnType, String[] annoNames, Class[] annoClazzs) {
-        if (annoNames != null && annoNames.length > 0) {
-            for (Field field : returnType.getDeclaredFields()) {
-                for (int i = 0; i < annoNames.length; i++) {
-                    if (annoClazzs != null && field.getName().equals(annoNames[i])) {
-//                        获取注解的Class类型
-//                        获取泛型上所有属性对应的bean
-                        getClassFields(annoClazzs[i], parameterBeanSet);
-                    } else {
-                        //当前属性为非泛型类型
-                        parameterBeanSet.add(getFieldBean(field));
-                    }
-                }
-            }
-        } else {
-            getClassFields(returnType, parameterBeanSet);
-        }
     }
 
     /**
@@ -144,7 +123,8 @@ public class AnnotationUtil1 {
         Parameter[] parameters = method.getParameters();
         for (Parameter parameter : parameters) {
             RequestBody annoRequestBody = parameter.getAnnotation(RequestBody.class);
-            if (annoRequestBody != null) {//如果标记了RequestBody注解
+            //如果标记了RequestBody注解
+            if (annoRequestBody != null) {
                 Class<?> type = parameter.getType();
 //                获取参数的所有属性
                 Field[] fields = type.getDeclaredFields();
@@ -155,8 +135,32 @@ public class AnnotationUtil1 {
                     dataTypeClass = annoDataType.type();
                     name = annoDataType.name();
                 }
-                getParameBeans(parameterBeanSet, type, name, dataTypeClass);
+                //获取所有属性对应的bean
+                parameterBeanSet.addAll(getClassParameBeans(type, name));
+                if (dataTypeClass != null) {
+                    for (Class clazz : dataTypeClass) {
+                        parameterBeanSet.addAll(getClassParameBeans(clazz, name));
+                    }
+                }
+
                 getObjectJson(methodBean, type, dataTypeClass, name, 0);
+            }
+        }
+        return parameterBeanSet;
+    }
+
+    private static Set<ParameterBean> getClassParameBeans(Class clazz, String[] name) {
+        Set<ParameterBean> parameterBeanSet = new HashSet<>();
+        Field[] declaredFields = clazz.getDeclaredFields();
+        for (Field field : declaredFields) {
+            if (name == null || Arrays.binarySearch(name, field.getName()) < 0) {
+                ParameterBean parameterBean = new ParameterBean();
+                parameterBean.setName(field.getName());
+                parameterBean.setType(field.getType().getSimpleName());
+                Des annotation = field.getAnnotation(Des.class);
+                if (annotation != null)
+                    parameterBean.setDesc(annotation.value());
+                parameterBeanSet.add(parameterBean);
             }
         }
         return parameterBeanSet;
@@ -238,7 +242,6 @@ public class AnnotationUtil1 {
             parameterBeanSet.add(getFieldBean(field));
         }
     }
-
 
     /**
      * 获取Field对应的bean
