@@ -176,24 +176,24 @@ public class AnnotationUtil1 {
         try {
             if (dataTypeClass == null || name == null || dataTypeClass.length < 1 || name.length < 1)
                 return;
-            Object o = type.newInstance();
-            Class type1 = dataTypeClass[0];
-
-            if (name != null && name.length > 0) {
-                for (int i = 0; i < name.length; i++) {
-                    Field declaredField = type.getDeclaredField(name[i]);
+            Object object = type.newInstance();
+            Object obj = null;
+            for (int i = name.length - 1; i >= 0; i--) {
+                if (obj == null) {
+                    obj = dataTypeClass[i].newInstance();
+                } else {
+                    Object o = dataTypeClass[i].newInstance();
+                    Field declaredField = o.getClass().getDeclaredField(name[i + 1]);
                     declaredField.setAccessible(true);
-                    Object o1 = type1.newInstance();
-                    declaredField.set(o, o1);
-                    if (i + 1 < name.length) {
-                        o = o1;
-                        type1 = dataTypeClass[i + 1];
-                        type = type1;
-                    }
+                    declaredField.set(o, obj);
+                    obj = o;
                 }
             }
-//                    System.out.println(new ObjectMapper().writeValueAsString(o));
-            String s = new ObjectMapper().writeValueAsString(o);
+            Field declaredField = object.getClass().getDeclaredField(name[0]);
+            declaredField.setAccessible(true);
+            declaredField.set(object, obj);
+
+            String s = new ObjectMapper().writeValueAsString(object);
             if (t == 0)
                 methodBean.setRequestJson(s);
             if (t == 1)

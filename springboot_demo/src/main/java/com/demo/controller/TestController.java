@@ -27,9 +27,9 @@ public class TestController {
     @PostMapping("/")
     @ResponseBody
 //    自定义注解
-    @DataType(name = "data", type = D.class)
+    @DataType(name = {"data","dr"}, type = {D.class,DR.class})
     @ResponseType(name = "data", type = DR.class)
-    public User<DR> addUser(@RequestBody User<D> user) {
+    public User<DR> addUser(@RequestBody User<D<DR>> user) {
         System.out.println(user);
         return null;
     }
