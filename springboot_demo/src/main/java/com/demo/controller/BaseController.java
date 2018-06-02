@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Description:
  */
 @Controller
-@RestController("/base")
+@RequestMapping("/base")
 public class BaseController {
 
 //    @RequestMapping(value = "/")
