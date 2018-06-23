@@ -1,6 +1,6 @@
 package test;
 
-import util.AnnotationUtil1;
+import util.AnnotationUtil;
 import util.ClassUtil;
 
 import java.util.List;
@@ -12,7 +12,7 @@ public class Test {
         List<Class<?>> clsList = ClassUtil.getAllClassByPackageName(Package.getPackage("com.demo.controller"));
         //输出所有使用了特定注解的类的注解值
 //        AnnotationUtil.validAnnotation(clsList);
-        AnnotationUtil1.validAnnotation(clsList);
+        AnnotationUtil.validAnnotation(clsList);
 
     }
 }
