@@ -1,3 +1,3 @@
-# JAVA_Demo
+# JAVA demo
 
 java学习
